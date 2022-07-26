@@ -90,9 +90,11 @@ class GeocodeData:
                 country_code = row[8]
                 if latitude and longitude and country_code:
                     city = row[1]
+                    city_type = row[7]
                     row = latitude, longitude, country_code, city
-                    writer.writerow(row)
-                    rows.append(row)
+                    if city_type not in ('PPLX', 'PPLA3', 'PPL', 'PPLH'):
+                        writer.writerow(row)
+                        rows.append(row)
             # cleanup downloaded files
             os.remove(downloadedFile)
             os.remove(GEOCODE_FILENAME)
@@ -127,7 +129,7 @@ def search(coordinates):
 
 if __name__ == '__main__':
     # test some coordinate lookups
-    city1 = -37.81, 144.96
+    city1 = 53.908205, 27.427256
     city2 = 31.76, 35.21
     print(get(city1))
     print(search([city1, city2]))
