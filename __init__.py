@@ -16,6 +16,10 @@ GEOCODE_URL = 'http://download.geonames.org/export/dump/cities1000.zip'
 GEOCODE_FILENAME = 'cities1000.txt'
 
 
+def is_moscow_part(admin1, country_code, city_type):
+    return admin1 == '48' and country_code == 'RU' and city_type != 'PPLC'
+
+
 def singleton(cls):
     """Singleton pattern to avoid loading class multiple times
     """
@@ -91,10 +95,12 @@ class GeocodeData:
                 if latitude and longitude and country_code:
                     city = row[1]
                     city_type = row[7]
+                    admin1 = row[10]
                     row = latitude, longitude, country_code, city
-                    if city_type not in ('PPLX', 'PPLA3', 'PPL', 'PPLH'):
-                        writer.writerow(row)
-                        rows.append(row)
+                    if city_type not in ('PPLX', 'PPLA3', 'PPLH'):
+                        if not is_moscow_part(admin1, country_code, city_type):
+                            writer.writerow(row)
+                            rows.append(row)
             # cleanup downloaded files
             os.remove(downloadedFile)
             os.remove(GEOCODE_FILENAME)
@@ -129,7 +135,7 @@ def search(coordinates):
 
 if __name__ == '__main__':
     # test some coordinate lookups
-    city1 = 53.908205, 27.427256
+    city1 = 55.68704223632812, 37.53937149047852
     city2 = 31.76, 35.21
     print(get(city1))
     print(search([city1, city2]))
